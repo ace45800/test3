@@ -132,7 +132,7 @@ using namespace v8;
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
 DECLARE_CALLBACK(ethash, ethash_hash, 32);
 
-DECLARE_FUNC(scrypt) {
+DECLARE_FUNC(ethash) {
    DECLARE_SCOPE;
 
    if (args.Length() < 3)

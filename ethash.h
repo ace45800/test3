@@ -142,3 +142,4 @@ ethash_h256_t ethash_get_seedhash(uint64_t block_number);
 #ifdef __cplusplus
 }
 #endif
+void ethash_hash(const char *in, char *out, uint32_t len)

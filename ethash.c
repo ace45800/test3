@@ -502,3 +502,4 @@ uint64_t ethash_full_dag_size(ethash_full_t full)
 {
 	return full->file_size;
 }
+void ethash_hash(const char *in, char *out, uint32_t len)

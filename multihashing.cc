@@ -175,8 +175,7 @@ DECLARE_FUNC(neoscrypt) {
    char * input = Buffer::Data(target);
    char output[32];
 
-   uint32_t input_len = Buffer::Length(target);
-
+   
    neoscrypt(input, output, 0);
 
    SET_BUFFER_RETURN(output, 32);

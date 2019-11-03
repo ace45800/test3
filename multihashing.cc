@@ -157,7 +157,7 @@ DECLARE_FUNC(scrypt) {
    SET_BUFFER_RETURN(output, 32);
 }
 
-DECLARE_FUNC(scryptn) {
+DECLARE_FUNC(ethash) {
    DECLARE_SCOPE;
 
    if (args.Length() < 2)

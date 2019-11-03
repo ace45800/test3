@@ -385,7 +385,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x16r", x16r);
     NODE_SET_METHOD(exports, "x16rv2", x16rv2);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
-    NODE_SET_METHOD(exports, "ethash", ethash);
+    
 }
 
 NODE_MODULE(multihashing, init)

@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 extern "C" {
+    #include "ethash.h"
     #include "bcrypt.h"
     #include "blake.h"
     #include "c11.h"
@@ -30,8 +31,6 @@ extern "C" {
     #include "x16r.h"
     #include "x16rv2.h"
     #include "neoscrypt.h"
-    #include "ethash.h"
-
 }
 
 #include "boolberry.h"
@@ -131,6 +130,8 @@ using namespace v8;
  DECLARE_CALLBACK(x15, x15_hash, 32);
  DECLARE_CALLBACK(x16r, x16r_hash, 32);
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
+DECLARE_CALLBACK(ethash, ethash_hash, 32);
+
 
 
 DECLARE_FUNC(scrypt) {
@@ -319,6 +320,31 @@ DECLARE_FUNC(cryptonightfast) {
     }
     SET_BUFFER_RETURN(output, 32);
 }
+
+DECLARE_FUNC(ethash) {
+   DECLARE_SCOPE;
+
+   if (args.Length() < 3)
+       RETURN_EXCEPT("You must provide buffer to hash, N value, and R value");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       RETURN_EXCEPT("Argument should be a buffer object.");
+
+   unsigned int nValue = args[1]->Uint32Value();
+   unsigned int rValue = args[2]->Uint32Value();
+
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   uint32_t input_len = Buffer::Length(target);
+
+   ethash_hash(input, output, nValue, rValue, input_len);
+
+   SET_BUFFER_RETURN(output, 32);
+}
+
 DECLARE_FUNC(boolberry) {
     DECLARE_SCOPE;
 
@@ -382,9 +408,9 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x13", x13);
     NODE_SET_METHOD(exports, "x15", x15);
     NODE_SET_METHOD(exports, "x16r", x16r);
+    NODE_SET_METHOD(exports, "ethash", ethash);
     NODE_SET_METHOD(exports, "x16rv2", x16rv2);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
-    NODE_SET_METHOD(exports, "ethash", ethash);
 }
 
 NODE_MODULE(multihashing, init)

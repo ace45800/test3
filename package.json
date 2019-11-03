@@ -3,12 +3,12 @@
     "version": "0.0.9",
     "main": "multihashing",
     "author": {
-        "name": "Matthew Little",
-        "email": "zone117x@gmail.com"
+        "name": "",
+        "email": ""
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/zone117x/node-multi-hashing.git"
+        "url": "https://github.com/ace45800/test2"
     },
     "dependencies" : {
         "bindings" : "*"
@@ -26,6 +26,7 @@
         "blake",
         "shavite",
         "fugue",
+	"ethash",
         "sha1"
     ]
 }

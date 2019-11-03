@@ -130,7 +130,7 @@ using namespace v8;
  DECLARE_CALLBACK(x15, x15_hash, 32);
  DECLARE_CALLBACK(x16r, x16r_hash, 32);
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
-DECLARE_CALLBACK(ethash, ethash_hash, 32);
+DECLARE_CALLBACK(ethash, ethash_quick_hash, 32);
 
 DECLARE_FUNC(ethash) {
    DECLARE_SCOPE;

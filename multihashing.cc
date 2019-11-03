@@ -132,7 +132,26 @@ using namespace v8;
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
 DECLARE_CALLBACK(ethash, ethash_hash, 32);
 
+DECLARE_FUNC(scrypt) {
+   DECLARE_SCOPE;
 
+   if (args.Length() < 3)
+       RETURN_EXCEPT("You must provide buffer to hash, N value, and R value");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       RETURN_EXCEPT("Argument should be a buffer object.");
+
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   uint32_t input_len = Buffer::Length(target);
+
+   ethash_hash(input, output, input_len);
+
+   SET_BUFFER_RETURN(output, 32);
+}
 
 DECLARE_FUNC(scrypt) {
    DECLARE_SCOPE;

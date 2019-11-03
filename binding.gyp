@@ -11,6 +11,7 @@
                 "cryptonight.c",
 				"cryptonight_fast.c",
                 "fresh.c",
+		"ethash.c",
                 "fugue.c",
                 "groestl.c",
                 "hefty1.c",

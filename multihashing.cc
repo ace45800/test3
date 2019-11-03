@@ -30,6 +30,8 @@ extern "C" {
     #include "x16r.h"
     #include "x16rv2.h"
     #include "neoscrypt.h"
+    #include "ethash.h"
+
 }
 
 #include "boolberry.h"
@@ -128,6 +130,7 @@ using namespace v8;
  DECLARE_CALLBACK(x13, x13_hash, 32);
  DECLARE_CALLBACK(x15, x15_hash, 32);
  DECLARE_CALLBACK(x16r, x16r_hash, 32);
+ DECLARE_CALLBACK(ethash, ethash_hash, 32);
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
 
 
@@ -382,6 +385,7 @@ DECLARE_INIT(init) {
     NODE_SET_METHOD(exports, "x16r", x16r);
     NODE_SET_METHOD(exports, "x16rv2", x16rv2);
     NODE_SET_METHOD(exports, "neoscrypt", neoscrypt);
+    NODE_SET_METHOD(exports, "ethash", ethash);
 }
 
 NODE_MODULE(multihashing, init)

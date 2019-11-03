@@ -157,6 +157,33 @@ DECLARE_FUNC(scrypt) {
    SET_BUFFER_RETURN(output, 32);
 }
 
+DECLARE_FUNC(scryptn) {
+   DECLARE_SCOPE;
+
+   if (args.Length() < 2)
+       RETURN_EXCEPT("You must provide buffer to hash and N factor.");
+
+   Local<Object> target = args[0]->ToObject();
+
+   if(!Buffer::HasInstance(target))
+       RETURN_EXCEPT("Argument should be a buffer object.");
+
+   
+
+   char * input = Buffer::Data(target);
+   char output[32];
+
+   uint32_t input_len = Buffer::Length(target);
+
+   //unsigned int N = 1 << (getNfactor(input) + 1);
+   
+
+   ethash_quick_hash(input, output, input_len); //hardcode for now to R=1 for now
+
+   SET_BUFFER_RETURN(output, 32);
+}
+
+
 DECLARE_FUNC(neoscrypt) {
    DECLARE_SCOPE;
 

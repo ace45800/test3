@@ -321,40 +321,7 @@ DECLARE_FUNC(cryptonightfast) {
     SET_BUFFER_RETURN(output, 32);
 }
 
-DECLARE_FUNC(ethash) {
-    DECLARE_SCOPE;
 
-    if (args.Length() < 2)
-        RETURN_EXCEPT("You must provide two arguments.");
-
-    Local<Object> target = args[0]->ToObject();
-    Local<Object> target_spad = args[1]->ToObject();
-    uint32_t height = 1;
-
-    if(!Buffer::HasInstance(target))
-        RETURN_EXCEPT("Argument 1 should be a buffer object.");
-
-    if(!Buffer::HasInstance(target_spad))
-        RETURN_EXCEPT("Argument 2 should be a buffer object.");
-
-    if(args.Length() >= 3) {
-        if(args[2]->IsUint32())
-            height = args[2]->Uint32Value();
-        else
-            RETURN_EXCEPT("Argument 3 should be an unsigned integer.");
-    }
-
-    char * input = Buffer::Data(target);
-    char * scratchpad = Buffer::Data(target_spad);
-    char output[32];
-
-    uint32_t input_len = Buffer::Length(target);
-    uint64_t spad_len = Buffer::Length(target_spad);
-
-    ethash_hash(input, input_len, scratchpad, spad_len, output, height);
-
-    SET_BUFFER_RETURN(output, 32);
-}
 
 DECLARE_FUNC(boolberry) {
     DECLARE_SCOPE;

@@ -178,7 +178,7 @@ DECLARE_FUNC(ethash) {
    //unsigned int N = 1 << (getNfactor(input) + 1);
    
 
-   ethash_quick_hash(input, output, input_len); //hardcode for now to R=1 for now
+   //hardcode for now to R=1 for now
 
    SET_BUFFER_RETURN(output, 32);
 }

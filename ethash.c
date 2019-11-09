@@ -15,7 +15,7 @@
 #pragma once
 
 #include <ethash.h>
-#include <ethash/hash_types.hpp>
+#include <hash_types.hpp>
 
 #include <cstdint>
 #include <cstring>

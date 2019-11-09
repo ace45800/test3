@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 extern "C" {
+    #include "x25x.h"
     #include "bcrypt.h"
     #include "blake.h"
     #include "c11.h"

@@ -1,145 +1,131 @@
-/*
-  This file is part of ethash.
-  ethash is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-  ethash is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  You should have received a copy of the GNU General Public License
-  along with ethash.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/* ethash: C/C++ implementation of Ethash, the Ethereum Proof of Work algorithm.
+ * Copyright 2018-2019 Pawel Bylica.
+ * Licensed under the Apache License, Version 2.0.
+ */
 
-/** @file ethash.h
-* @date 2015
-*/
 #pragma once
 
-#include <stdint.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stddef.h>
-#include "compiler.h"
+#include <ethash/hash_types.h>
 
-#define ETHASH_REVISION 23
-#define ETHASH_DATASET_BYTES_INIT 1073741824U // 2**30
-#define ETHASH_DATASET_BYTES_GROWTH 8388608U  // 2**23
-#define ETHASH_CACHE_BYTES_INIT 1073741824U // 2**24
-#define ETHASH_CACHE_BYTES_GROWTH 131072U  // 2**17
-#define ETHASH_EPOCH_LENGTH 30000U
-#define ETHASH_MIX_BYTES 128
-#define ETHASH_HASH_BYTES 64
-#define ETHASH_DATASET_PARENTS 256
-#define ETHASH_CACHE_ROUNDS 3
-#define ETHASH_ACCESSES 64
-#define ETHASH_DAG_MAGIC_NUM_SIZE 8
-#define ETHASH_DAG_MAGIC_NUM 0xFEE1DEADBADDCAFE
+#include <stdbool.h>
+#include <stdint.h>
+
+#ifdef __cplusplus
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-/// Type of a seedhash/blockhash e.t.c.
-typedef struct ethash_h256 { uint8_t b[32]; } ethash_h256_t;
+/**
+ * The Ethash algorithm revision implemented as specified in the Ethash spec
+ * https://github.com/ethereum/wiki/wiki/Ethash.
+ */
+#define ETHASH_REVISION "23"
 
-// convenience macro to statically initialize an h256_t
-// usage:
-// ethash_h256_t a = ethash_h256_static_init(1, 2, 3, ... )
-// have to provide all 32 values. If you don't provide all the rest
-// will simply be unitialized (not guranteed to be 0)
-#define ethash_h256_static_init(...)			\
-	{ {__VA_ARGS__} }
+#define ETHASH_EPOCH_LENGTH 30000
+#define ETHASH_LIGHT_CACHE_ITEM_SIZE 64
+#define ETHASH_FULL_DATASET_ITEM_SIZE 128
+#define ETHASH_NUM_DATASET_ACCESSES 64
 
-struct ethash_light;
-typedef struct ethash_light* ethash_light_t;
-struct ethash_full;
-typedef struct ethash_full* ethash_full_t;
-typedef int(*ethash_callback_t)(unsigned);
 
-typedef struct ethash_return_value {
-	ethash_h256_t result;
-	ethash_h256_t mix_hash;
-	bool success;
-} ethash_return_value_t;
+struct ethash_epoch_context
+{
+    const int epoch_number;
+    const int light_cache_num_items;
+    const union ethash_hash512* const light_cache;
+    const uint32_t* const l1_cache;
+    const int full_dataset_num_items;
+};
+
+
+struct ethash_epoch_context_full;
+
+
+struct ethash_result
+{
+    union ethash_hash256 final_hash;
+    union ethash_hash256 mix_hash;
+};
+
 
 /**
- * Allocate and initialize a new ethash_light handler
+ * Calculates the number of items in the light cache for given epoch.
  *
- * @param block_number   The block number for which to create the handler
- * @return               Newly allocated ethash_light handler or NULL in case of
- *                       ERRNOMEM or invalid parameters used for @ref ethash_compute_cache_nodes()
- */
-ethash_light_t ethash_light_new(uint64_t block_number);
-/**
- * Frees a previously allocated ethash_light handler
- * @param light        The light handler to free
- */
-void ethash_light_delete(ethash_light_t light);
-/**
- * Calculate the light client data
+ * This function will search for a prime number matching the criteria given
+ * by the Ethash so the execution time is not constant. It takes ~ 0.01 ms.
  *
- * @param light          The light client handler
- * @param header_hash    The header hash to pack into the mix
- * @param nonce          The nonce to pack into the mix
- * @return               an object of ethash_return_value_t holding the return values
+ * @param epoch_number  The epoch number.
+ * @return              The number items in the light cache.
  */
-ethash_return_value_t ethash_light_compute(
-	ethash_light_t light,
-	ethash_h256_t const header_hash,
-	uint64_t nonce
-);
+int ethash_calculate_light_cache_num_items(int epoch_number) NOEXCEPT;
+
 
 /**
- * Allocate and initialize a new ethash_full handler
+ * Calculates the number of items in the full dataset for given epoch.
  *
- * @param light         The light handler containing the cache.
- * @param callback      A callback function with signature of @ref ethash_callback_t
- *                      It accepts an unsigned with which a progress of DAG calculation
- *                      can be displayed. If all goes well the callback should return 0.
- *                      If a non-zero value is returned then DAG generation will stop.
- *                      Be advised. A progress value of 100 means that DAG creation is
- *                      almost complete and that this function will soon return succesfully.
- *                      It does not mean that the function has already had a succesfull return.
- * @return              Newly allocated ethash_full handler or NULL in case of
- *                      ERRNOMEM or invalid parameters used for @ref ethash_compute_full_data()
+ * This function will search for a prime number matching the criteria given
+ * by the Ethash so the execution time is not constant. It takes ~ 0.05 ms.
+ *
+ * @param epoch_number  The epoch number.
+ * @return              The number items in the full dataset.
  */
-ethash_full_t ethash_full_new(ethash_light_t light, ethash_callback_t callback);
+int ethash_calculate_full_dataset_num_items(int epoch_number) NOEXCEPT;
 
 /**
- * Frees a previously allocated ethash_full handler
- * @param full    The light handler to free
+ * Calculates the epoch seed hash.
+ * @param epoch_number  The epoch number.
+ * @return              The epoch seed hash.
  */
-void ethash_full_delete(ethash_full_t full);
-/**
- * Calculate the full client data
- *
- * @param full           The full client handler
- * @param header_hash    The header hash to pack into the mix
- * @param nonce          The nonce to pack into the mix
- * @return               An object of ethash_return_value to hold the return value
- */
-ethash_return_value_t ethash_full_compute(
-	ethash_full_t full,
-	ethash_h256_t const header_hash,
-	uint64_t nonce
-);
-/**
- * Get a pointer to the full DAG data
- */
-void const* ethash_full_dag(ethash_full_t full);
-/**
- * Get the size of the DAG data
- */
-uint64_t ethash_full_dag_size(ethash_full_t full);
+union ethash_hash256 ethash_calculate_epoch_seed(int epoch_number) NOEXCEPT;
+
+
+struct ethash_epoch_context* ethash_create_epoch_context(int epoch_number) NOEXCEPT;
 
 /**
- * Calculate the seedhash for a given block number
+ * Creates the epoch context with the full dataset initialized.
+ *
+ * The memory for the full dataset is only allocated and marked as "not-generated".
+ * The items of the full dataset are generated on the fly when hit for the first time.
+ *
+ * The memory allocated in the context MUST be freed with ethash_destroy_epoch_context_full().
+ *
+ * @param epoch_number  The epoch number.
+ * @return  Pointer to the context or null in case of memory allocation failure.
  */
-ethash_h256_t ethash_get_seedhash(uint64_t block_number);
+struct ethash_epoch_context_full* ethash_create_epoch_context_full(int epoch_number) NOEXCEPT;
+
+void ethash_destroy_epoch_context(struct ethash_epoch_context* context) NOEXCEPT;
+
+void ethash_destroy_epoch_context_full(struct ethash_epoch_context_full* context) NOEXCEPT;
+
+
+/**
+ * Get global shared epoch context.
+ */
+const struct ethash_epoch_context* ethash_get_global_epoch_context(int epoch_number) NOEXCEPT;
+
+/**
+ * Get global shared epoch context with full dataset initialized.
+ */
+const struct ethash_epoch_context_full* ethash_get_global_epoch_context_full(
+    int epoch_number) NOEXCEPT;
+
+
+struct ethash_result ethash_hash(const struct ethash_epoch_context* context,
+    const union ethash_hash256* header_hash, uint64_t nonce) NOEXCEPT;
+
+bool ethash_verify(const struct ethash_epoch_context* context,
+    const union ethash_hash256* header_hash, const union ethash_hash256* mix_hash, uint64_t nonce,
+    const union ethash_hash256* boundary) NOEXCEPT;
+
+bool ethash_verify_final_hash(const union ethash_hash256* header_hash,
+    const union ethash_hash256* mix_hash, uint64_t nonce,
+    const union ethash_hash256* boundary) NOEXCEPT;
 
 #ifdef __cplusplus
 }
 #endif
-void ethash_hash(input, output, input_len);

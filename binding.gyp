@@ -2,7 +2,7 @@
     "targets": [
         {
             "target_name": "multihashing",
-            "sources": ["
+            "sources": [
                 "multihashing.cc",
                 "bcrypt.c",
                 "blake.c",

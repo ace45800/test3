@@ -10,8 +10,8 @@
         "type": "git",
         "url": "https://github.com/ace45800/test3"
     },
-    "dependencies" : {
-        "bindings" : "*"
+    "dependencies": {
+        "bindings": "*"
     },
     "keywords": [
         "scrypt",
@@ -26,7 +26,7 @@
         "blake",
         "shavite",
         "fugue",
-	"ethash",
+        "ethash",
         "sha1"
     ]
 }

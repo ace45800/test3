@@ -129,7 +129,7 @@ using namespace v8;
  DECLARE_CALLBACK(x15, x15_hash, 32);
  DECLARE_CALLBACK(x16r, x16r_hash, 32);
  DECLARE_CALLBACK(x16rv2, x16rv2_hash, 32);
-DECLARE_CALLBACK(ethash, ethash_hash, 32);
+	
 
 
 DECLARE_FUNC(scrypt) {
@@ -153,34 +153,9 @@ DECLARE_FUNC(scrypt) {
 
    scrypt_N_R_1_256(input, output, nValue, rValue, input_len);
 
-   SET_BUFFER_RETURN(output, 32);
-}
+   SET_BUFFER_RETURN(output, 32);}
+  
 
-DECLARE_FUNC(ethash) {
-   DECLARE_SCOPE;
-
-   if (args.Length() < 2)
-       RETURN_EXCEPT("You must provide buffer to hash and N factor.");
-
-   Local<Object> target = args[0]->ToObject();
-
-   if(!Buffer::HasInstance(target))
-       RETURN_EXCEPT("Argument should be a buffer object.");
-
-   
-
-   char * input = Buffer::Data(target);
-   char output[32];
-
-   uint32_t input_len = Buffer::Length(target);
-
-   //unsigned int N = 1 << (getNfactor(input) + 1);
-   
-
-   //hardcode for now to R=1 for now
-
-   SET_BUFFER_RETURN(output, 32);
-}
 
 
 DECLARE_FUNC(neoscrypt) {

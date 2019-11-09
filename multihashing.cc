@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 extern "C" {
-    #include "ethash.h"
     #include "bcrypt.h"
     #include "blake.h"
     #include "c11.h"
